@@ -1467,18 +1467,26 @@ trait HasAttributes
      *
      * @return array
      */
-    public function getDates(): array
+    public function getDates()
     {
-        $dateAttributes = array_filter(
-            array_keys($this->getCasts()), fn (string $key): bool => $this->isDateCastable($key)
-        );
-
-        $timestamps = $this->usesTimestamps() ? [
+        return $this->usesTimestamps() ? [
             $this->getCreatedAtColumn(),
             $this->getUpdatedAtColumn(),
         ] : [];
+    }
 
-        return array_unique([...$dateAttributes, ...$timestamps]);
+    /**
+     * Get all attributes that should be converted to dates including timestamps and user-defined.
+     *
+     * @return array
+     */
+    public function getDateCastableAttributes(): array
+    {
+        $dateAttributes = array_filter(
+            array_keys($this->getCasts()), fn(string $key): bool => $this->isDateCastable($key)
+        );
+
+        return array_unique([...$dateAttributes, ...$this->getDates()]);
     }
 
     /**
